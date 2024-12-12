@@ -1,9 +1,4 @@
-import {
-  geojsonTypes,
-  updateActions,
-  events,
-} from "@mapbox/mapbox-gl-draw/src/constants";
-
+import {constants} from "@mapbox/mapbox-gl-draw";
 import difference from "@turf/difference";
 
 import {
@@ -36,8 +31,8 @@ CutPolygonMode.onSetup = function (opt) {
       onDraw: (cuttingpolygon) => {
         main.forEach((feature) => {
           if (
-            feature.geometry.type === geojsonTypes.POLYGON ||
-            feature.geometry.type === geojsonTypes.MULTI_POLYGON
+            feature.geometry.type === constants.geojsonTypes.POLYGON ||
+            feature.geometry.type === constants.geojsonTypes.MULTI_POLYGON
           ) {
             const afterCut = difference(feature, cuttingpolygon);
             const newF = this.newFeature(afterCut);
@@ -70,9 +65,9 @@ CutPolygonMode.toDisplayFeatures = function (state, geojson, display) {
 };
 
 CutPolygonMode.fireUpdate = function (newF) {
-  this.map.fire(events.UPDATE, {
-    action: updateActions.CHANGE_COORDINATES,
-    features: newF.toGeoJSON(),
+  this.map.fire(constants.events.UPDATE, {
+    action: constants.updateActions.CHANGE_COORDINATES,
+    features: [newF.toGeoJSON()],
   });
 };
 
