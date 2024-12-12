@@ -67,7 +67,7 @@ CutPolygonMode.toDisplayFeatures = function (state, geojson, display) {
 CutPolygonMode.fireUpdate = function (newF) {
   this.map.fire(constants.events.UPDATE, {
     action: constants.updateActions.CHANGE_COORDINATES,
-    features: newF.toGeoJSON(),
+    features: [newF.toGeoJSON()],
   });
 };
 
