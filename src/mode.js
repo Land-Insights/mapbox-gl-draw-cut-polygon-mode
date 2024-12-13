@@ -29,21 +29,30 @@ CutPolygonMode.onSetup = function (opt) {
   setTimeout(() => {
     this.changeMode(passingModeName, {
       onDraw: (cuttingpolygon) => {
-        main.forEach((feature) => {
-          if (
-            feature.geometry.type === constants.geojsonTypes.POLYGON ||
-            feature.geometry.type === constants.geojsonTypes.MULTI_POLYGON
-          ) {
-            const afterCut = difference(feature, cuttingpolygon);
-            const newF = this.newFeature(afterCut);
-            newF.id = feature.id;
+        try {
+          main.forEach((feature) => {
+            if (
+              feature.geometry.type === constants.geojsonTypes.POLYGON ||
+              feature.geometry.type === constants.geojsonTypes.MULTI_POLYGON
+            ) {
+              const afterCut = difference(feature, cuttingpolygon);
+              const newF = this.newFeature(afterCut);
+              newF.id = feature.id;
 
-            this.addFeature(newF);
-            this.fireUpdate(newF);
-          } else {
-            console.info("The feature is not Polygon/MultiPolygon!");
-          }
-        });
+              this.addFeature(newF);
+              this.fireUpdate(newF);
+            } else {
+              console.info("The feature is not Polygon/MultiPolygon!");
+            }
+          });
+        }
+        catch (error) {
+          console.error(error);
+          this.deleteFeature(cuttingpolygon.id);
+          if (main?.[0]?.id)
+            api.setFeatureProperty(main[0].id, highlightPropertyName, undefined);
+          this.fireError(error);
+        }
       },
       onCancel: () => {
         if (main?.[0]?.id)
@@ -70,5 +79,9 @@ CutPolygonMode.fireUpdate = function (newF) {
     features: [newF.toGeoJSON()],
   });
 };
+
+CutPolygonMode.fireError = function(error) {
+  this.map.fire("draw.error", error);
+}
 
 export default CutPolygonMode;
